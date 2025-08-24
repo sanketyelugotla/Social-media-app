@@ -1,6 +1,16 @@
 const express = require("express");
 const { authenticateToken } = require("../middleware/auth");
 const { validateFollowUser, validateSearchUsers } = require("../middleware/validation")
+const {
+    follow,
+    unfollow,
+    getMyFollowing,
+    getMyFollowers,
+    getMyStats,
+    searchUsers,
+    getUserProfileById,
+} = require("../controllers/users")
+
 
 const router = express.Router();
 

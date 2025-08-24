@@ -5,6 +5,9 @@ const {
 	getFollowing,
 	getFollowers,
 	getFollowCounts,
+} = require('../models/follow')
+
+const {
 	findUsersByName,
 	getUserProfile,
 	getUserById,
