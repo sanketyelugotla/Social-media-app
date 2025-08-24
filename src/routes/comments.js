@@ -1,5 +1,17 @@
-const express = require("express");
-const { authenticateToken } = require("../middleware/auth");
+const express = require("express")
+const { authenticateToken } = require("../middleware/auth")
+const {
+    validateCreateComment,
+    validateUpdateComment,
+    validateCommentId,
+    validatePostId,
+} = require("../middleware/validation")
+const {
+    create,
+    update,
+    remove,
+    getPostCommentsController,
+} = require("../controllers/comments")
 
 const router = express.Router();
 
@@ -9,8 +21,15 @@ const router = express.Router();
  */
 
 // TODO: POST /api/comments - Create a comment on a post
+router.post("/", authenticateToken, validateCreateComment, create)
+
 // TODO: PUT /api/comments/:comment_id - Update a comment
+router.put("/:comment_id", authenticateToken, validateCommentId, validateUpdateComment, update)
+
 // TODO: DELETE /api/comments/:comment_id - Delete a comment
+router.delete("/:comment_id", authenticateToken, validateCommentId, remove)
+
 // TODO: GET /api/comments/post/:post_id - Get comments for a post
+router.get("/post/:post_id", authenticateToken, validatePostId, getPostCommentsController)
 
 module.exports = router;

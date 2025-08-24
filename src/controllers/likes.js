@@ -85,7 +85,7 @@ const unlike = async (req, res) => {
 }
 
 // TODO: Implement getPostLikes function
-const getPostLikes = async (req, res) => {
+const getPostLikesController = async (req, res) => {
 	try {
 		const { post_id } = req.params
 		const page = Number.parseInt(req.query.page) || 1
@@ -144,6 +144,6 @@ module.exports = {
 	// Functions will be implemented here
 	like,
 	unlike,
-	getPostLikes,
-	getUserLikes,
+	getPostLikesController,
+	getUserLikesController,
 };

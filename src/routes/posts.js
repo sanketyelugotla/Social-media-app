@@ -1,11 +1,14 @@
 const express = require("express");
-const { validateRequest, createPostSchema } = require("../utils/validation");
+const { validateRequest, createPostSchema, updatePostSchema } = require("../utils/validation");
 const {
 	create,
 	getById,
 	getUserPosts,
 	getMyPosts,
+	getFeed,
 	remove,
+	update,
+	search,
 } = require("../controllers/posts");
 const { authenticateToken, optionalAuth } = require("../middleware/auth");
 
