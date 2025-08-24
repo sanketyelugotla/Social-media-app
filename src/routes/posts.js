@@ -32,8 +32,13 @@ router.delete("/:post_id", authenticateToken, remove);
 
 // TODO: Add route for content feed
 // GET /api/posts/feed - Get posts from followed users
+router.get("/feed", authenticateToken, getFeed)
 
 // TODO: Add route for updating posts
 // PUT /api/posts/:post_id - Update a post
+router.put("/:post_id", authenticateToken, validateRequest(updatePostSchema), update)
+
+// GET /api/posts/search - Search posts by content
+router.get("/search", optionalAuth, search)
 
 module.exports = router;
