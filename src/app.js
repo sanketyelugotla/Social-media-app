@@ -8,6 +8,8 @@ const { connectDB } = require("./utils/database");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const postRoutes = require("./routes/posts");
+const likesRoutes = require("./routes/likes")
+const commentsRoutes = require("./routes/comments")
 
 /**
  * Express application setup and configuration
@@ -22,6 +24,10 @@ app.use(cors());
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+app.get("/", (req, res) => {
+	res.json({ message: "Social media API is running" })
+})
 
 // API routes
 app.use("/api/auth", authRoutes);

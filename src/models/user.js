@@ -62,14 +62,55 @@ const verifyPassword = async (plainPassword, hashedPassword) => {
 
 // TODO: Implement findUsersByName function for search functionality
 // This should support partial name matching and pagination
+/**
+ * Find users by name (partial matching)
+ * @param {string} searchTerm - Search term for username or full name
+ * @param {number} limit - Number of results to return
+ * @param {number} offset - Offset for pagination
+ * @returns {Promise<Array>} Array of users
+ */
+const findUsersByName = async (searchTerm, limit = 20, offset = 0) => {
+  const result = await query(
+    `SELECT id, username, full_name, created_at
+     FROM users
+     WHERE (username ILIKE $1 OR full_name ILIKE $1) AND is_deleted = FALSE
+     ORDER BY username
+     LIMIT $2 OFFSET $3`,
+    [`%${searchTerm}%`, limit, offset],
+  )
+  return result.rows
+}
 
 // TODO: Implement getUserProfile function that includes follower/following counts
+/**
+ * Get user profile with follow counts
+ * @param {number} userId - User ID
+ * @returns {Promise<Object|null>} User profile with counts
+ */
+const getUserProfile = async (userId) => {
+  const userResult = await query(`SELECT id, username, email, full_name, created_at FROM users WHERE id = $1`, [userId])
+
+  if (userResult.rows.length === 0) {
+    return null
+  }
+
+  const user = userResult.rows[0]
+  const counts = await getFollowCounts(userId)
+
+  return {
+    ...user,
+    ...counts,
+  }
+}
 
 // TODO: Implement updateUserProfile function for profile updates
+
 
 module.exports = {
   createUser,
   getUserByUsername,
   getUserById,
   verifyPassword,
+  findUsersByName,
+  getUserProfile
 };

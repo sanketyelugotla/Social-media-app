@@ -1,0 +1,2 @@
+1. While registering user original password is begin saved insted of hashed password
+2. In auth middleware while verifying jwt token secret is not begin passed
