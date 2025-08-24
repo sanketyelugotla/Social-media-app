@@ -20,7 +20,8 @@ const logger = require("../utils/logger");
 // TODO: Implement likePost function
 const like = async (req, res) => {
 	try {
-		const { post_id } = req.body
+		const { post_id } = req.params
+		console.log(post_id)
 		const userId = req.user.id
 
 		// Check if post exists

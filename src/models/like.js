@@ -55,6 +55,16 @@ const getPostLikes = async (postId, limit = 20, offset = 0) => {
 	return result.rows
 }
 
+/**
+ * Get like count for a post
+ * @param {number} postId - Post ID
+ * @returns {Promise<number>} Number of likes
+ */
+const getPostLikeCount = async (postId) => {
+	const result = await query(`SELECT COUNT(*) as count FROM likes WHERE post_id = $1`, [postId])
+	return Number.parseInt(result.rows[0].count)
+}
+
 // TODO: Implement getUserLikes function
 /**
  * Get posts liked by a user
@@ -100,4 +110,5 @@ module.exports = {
 	getPostLikes,
 	getUserLikes,
 	hasUserLikedPost,
+	getPostLikeCount,
 };

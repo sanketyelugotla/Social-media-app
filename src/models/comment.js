@@ -21,6 +21,22 @@ const createComment = async ({ user_id, post_id, content }) => {
 	return result.rows[0]
 }
 
+/**
+ * Get comment count for a post
+ * @param {number} postId - Post ID
+ * @returns {Promise<number>} Number of comments
+ */
+const getPostCommentCount = async (postId) => {
+	const result = await query(
+		`SELECT COUNT(*) as count 
+     FROM comments c
+     JOIN users u ON c.user_id = u.id
+     WHERE c.post_id = $1 AND c.is_deleted = FALSE AND u.is_deleted = FALSE`,
+		[postId],
+	)
+	return Number.parseInt(result.rows[0].count)
+}
+
 // TODO: Implement updateComment 
 /**
  * Update a comment
@@ -104,4 +120,5 @@ module.exports = {
 	deleteComment,
 	getPostComments,
 	getCommentById,
+	getPostCommentCount,
 };

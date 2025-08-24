@@ -11,7 +11,7 @@ const router = express.Router();
  */
 
 // TODO: POST /api/likes - Like a post
-router.post("/", authenticateToken, validateLikePost, like)
+router.post("/:post_id", authenticateToken, validateLikePost, like)
 
 // TODO: DELETE /api/likes/:post_id - Unlike a post
 router.delete("/:post_id", authenticateToken, validatePostId, unlike)

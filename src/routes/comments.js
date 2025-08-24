@@ -21,7 +21,7 @@ const router = express.Router();
  */
 
 // TODO: POST /api/comments - Create a comment on a post
-router.post("/", authenticateToken, validateCreateComment, create)
+router.post("/:post_id", authenticateToken, validateCreateComment, create)
 
 // TODO: PUT /api/comments/:comment_id - Update a comment
 router.put("/:comment_id", authenticateToken, validateCommentId, validateUpdateComment, update)

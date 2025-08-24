@@ -81,6 +81,21 @@ const findUsersByName = async (searchTerm, limit = 20, offset = 0) => {
   return result.rows
 }
 
+/**
+ * Get follow counts for a user
+ * @param {number} userId - User ID
+ * @returns {Promise<Object>} Follow counts
+ */
+const getFollowCounts = async (userId) => {
+  const result = await query(
+    `SELECT 
+       (SELECT COUNT(*) FROM follows WHERE follower_id = $1) as following_count,
+       (SELECT COUNT(*) FROM follows WHERE following_id = $1) as followers_count`,
+    [userId],
+  )
+  return result.rows[0]
+}
+
 // TODO: Implement getUserProfile function that includes follower/following counts
 /**
  * Get user profile with follow counts

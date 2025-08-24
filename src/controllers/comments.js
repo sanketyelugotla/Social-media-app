@@ -12,6 +12,7 @@ const {
 	deleteComment,
 	getCommentById,
 	getPostComments,
+	getPostCommentCount,
 } = require("../models/comment")
 const { getPostById } = require("../models/post")
 const logger = require("../utils/logger");

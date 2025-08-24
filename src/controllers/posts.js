@@ -87,7 +87,7 @@ const getUserPosts = async (req, res) => {
  */
 const getMyPosts = async (req, res) => {
   try {
-    const { user_id: userId } = req.params;
+    const { id: userId } = req.user;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const offset = (page - 1) * limit;
@@ -137,6 +137,7 @@ const remove = async (req, res) => {
  * Get feed posts (posts from followed users + own posts)
  */
 const getFeed = async (req, res) => {
+  console.log("GEt feed")
   try {
     const userId = req.user.id
     const page = Number.parseInt(req.query.page) || 1

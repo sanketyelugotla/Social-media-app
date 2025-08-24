@@ -33,6 +33,8 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
+app.use('/api/likes', likesRoutes);
+app.use('/api/comments', commentsRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {

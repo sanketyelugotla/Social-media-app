@@ -19,7 +19,7 @@ const validateSearchUsers = (req, res, next) => {
 }
 
 const validateLikePost = (req, res, next) => {
-    const { post_id } = req.body
+    const { post_id } = req.params
 
     if (!post_id || isNaN(Number.parseInt(post_id))) {
         return res.status(400).json({ error: "Valid post ID is required" })
@@ -39,7 +39,8 @@ const validatePostId = (req, res, next) => {
 }
 
 const validateCreateComment = (req, res, next) => {
-    const { post_id, content } = req.body
+    const { content } = req.body
+    const { post_id } = req.params
 
     if (!post_id || isNaN(Number.parseInt(post_id))) {
         return res.status(400).json({ error: "Valid post ID is required" })

@@ -17,7 +17,7 @@ const createPost = async ({
 }) => {
   const result = await query(
     `INSERT INTO posts (user_id, content, media_url, comments_enabled, created_at, is_deleted)
-     VALUES ($1, $2, $3, $4, NOW(), true)
+     VALUES ($1, $2, $3, $4, NOW(), false)
      RETURNING id, user_id, content, media_url, comments_enabled, created_at`,
     [user_id, content, media_url, comments_enabled],
   );
@@ -30,17 +30,25 @@ const createPost = async ({
  * @param {number} postId - Post ID
  * @returns {Promise<Object|null>} Post object or null
  */
-const getPostById = async (postId) => {
+const getPostById = async (postId, userId = null) => {
   const result = await query(
-    `SELECT p.*, u.username, u.full_name
+    `SELECT p.*, 
+            u.username, 
+            u.full_name,
+            (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS likes_count,
+            (SELECT COUNT(*) FROM comments WHERE post_id = p.id AND is_deleted = false) AS comments_count,
+            ${userId ?
+      `(SELECT COUNT(*) > 0 FROM likes WHERE post_id = p.id AND user_id = $2) AS is_liked_by_user`
+      : 'false AS is_liked_by_user'}
      FROM posts p
      JOIN users u ON p.user_id = u.id
-     WHERE p.id = $1`,
-    [postId],
+     WHERE p.id = $1 AND p.is_deleted = false AND u.is_deleted = false`,
+    userId ? [postId, userId] : [postId],
   );
 
   return result.rows[0] || null;
 };
+
 
 /**
  * Get posts by user ID
@@ -71,7 +79,7 @@ const getPostsByUserId = async (userId, limit = 20, offset = 0) => {
  */
 const deletePost = async (postId, userId) => {
   const result = await query(
-    "UPDATE posts SET is_deleted = false WHERE id = $1 AND user_id = $2",
+    "UPDATE posts SET is_deleted = true WHERE id = $1 AND user_id = $2",
     [postId, userId],
   );
 
@@ -161,6 +169,7 @@ module.exports = {
   createPost,
   getPostById,
   getPostsByUserId,
+  getFeedPosts,
   deletePost,
   updatePost,
   searchPosts,
