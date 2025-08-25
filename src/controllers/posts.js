@@ -14,7 +14,8 @@ const logger = require("../utils/logger");
  */
 const create = async (req, res) => {
   try {
-    const { content, media_url, comments_enabled } = req.validatedData;
+    const { content, media_url, comments_enabled, scheduled_at } = req.validatedData;
+    console.log(scheduled_at)
     const userId = req.user.id;
 
     const post = await createPost({
@@ -22,6 +23,7 @@ const create = async (req, res) => {
       content,
       media_url,
       comments_enabled,
+      scheduled_at,
     });
 
     logger.verbose(`User ${userId} created post ${post.id}`);

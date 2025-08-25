@@ -2,3 +2,9 @@
 2. In auth middleware while verifying jwt token secret is not begin passed
 3. In create post the default value of is_deleted is true
 4. In delete post the is_deleted is chaging to false instead of true
+
+
+Functions implemented
+1. Users can follow and unfollow each other.
+2. Users can post and edit content and their followers can view their posts
+3. Users can comment, uncomment like and unlike the posts.

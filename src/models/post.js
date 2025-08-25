@@ -14,14 +14,16 @@ const createPost = async ({
   content,
   media_url,
   comments_enabled = true,
+  scheduled_at = null
 }) => {
+  // If not scheduled, use current time
+  const scheduledTime = scheduled_at || new Date();
   const result = await query(
-    `INSERT INTO posts (user_id, content, media_url, comments_enabled, created_at, is_deleted)
-     VALUES ($1, $2, $3, $4, NOW(), false)
-     RETURNING id, user_id, content, media_url, comments_enabled, created_at`,
-    [user_id, content, media_url, comments_enabled],
+    `INSERT INTO posts (user_id, content, media_url, comments_enabled, created_at, updated_at, is_deleted, scheduled_at)
+     VALUES ($1, $2, $3, $4, NOW(), NOW(), false, $5)
+     RETURNING id, user_id, content, media_url, comments_enabled, created_at, updated_at, scheduled_at`,
+    [user_id, content, media_url, comments_enabled, scheduledTime],
   );
-
   return result.rows[0];
 };
 
@@ -42,13 +44,12 @@ const getPostById = async (postId, userId = null) => {
       : 'false AS is_liked_by_user'}
      FROM posts p
      JOIN users u ON p.user_id = u.id
-     WHERE p.id = $1 AND p.is_deleted = false AND u.is_deleted = false`,
+     WHERE p.id = $1 AND p.is_deleted = false AND u.is_deleted = false
+       AND p.scheduled_at <= NOW()`, // <-- Only visible if published
     userId ? [postId, userId] : [postId],
   );
-
   return result.rows[0] || null;
 };
-
 
 /**
  * Get posts by user ID
@@ -62,12 +63,12 @@ const getPostsByUserId = async (userId, limit = 20, offset = 0) => {
     `SELECT p.*, u.username, u.full_name
      FROM posts p
      JOIN users u ON p.user_id = u.id
-     WHERE p.user_id = $1
-     ORDER BY p.created_at DESC
+     WHERE p.user_id = $1 AND p.scheduled_at <= NOW()
+       AND p.is_deleted = false AND u.is_deleted = false
+     ORDER BY p.scheduled_at DESC
      LIMIT $2 OFFSET $3`,
     [userId, limit, offset],
   );
-
   return result.rows;
 };
 
@@ -79,15 +80,12 @@ const getPostsByUserId = async (userId, limit = 20, offset = 0) => {
  */
 const deletePost = async (postId, userId) => {
   const result = await query(
-    "UPDATE posts SET is_deleted = true WHERE id = $1 AND user_id = $2",
+    "UPDATE posts SET is_deleted = true, updated_at = NOW() WHERE id = $1 AND user_id = $2",
     [postId, userId],
   );
-
   return result.rowCount > 0;
 };
 
-// TODO: Implement getFeedPosts function that returns posts from followed users
-// This should include pagination and ordering by creation date
 /**
  * Get feed posts for a user (posts from followed users + own posts)
  * @param {number} userId - Current user ID
@@ -104,21 +102,20 @@ const getFeedPosts = async (userId, limit = 20, offset = 0) => {
      FROM posts p
      JOIN users u ON p.user_id = u.id
      WHERE p.is_deleted = false AND u.is_deleted = false
-     AND (
-       p.user_id = $1 OR 
-       p.user_id IN (
-         SELECT following_id FROM follows WHERE follower_id = $1
+       AND p.scheduled_at <= NOW()
+       AND (
+         p.user_id = $1 OR 
+         p.user_id IN (
+           SELECT following_id FROM follows WHERE follower_id = $1
+         )
        )
-     )
-     ORDER BY p.created_at DESC
+     ORDER BY p.scheduled_at DESC
      LIMIT $2 OFFSET $3`,
     [userId, limit, offset],
-  )
+  );
+  return result.rows;
+};
 
-  return result.rows
-}
-
-// TODO: Implement updatePost function for editing posts
 /**
  * Update a post
  * @param {number} postId - Post ID
@@ -126,22 +123,21 @@ const getFeedPosts = async (userId, limit = 20, offset = 0) => {
  * @param {Object} updateData - Data to update
  * @returns {Promise<Object|null>} Updated post or null
  */
-const updatePost = async (postId, userId, { content, media_url, comments_enabled }) => {
+const updatePost = async (postId, userId, { content, media_url, comments_enabled, scheduled_at }) => {
   const result = await query(
     `UPDATE posts 
      SET content = COALESCE($1, content),
          media_url = COALESCE($2, media_url),
          comments_enabled = COALESCE($3, comments_enabled),
+         scheduled_at = COALESCE($4, scheduled_at),
          updated_at = NOW()
-     WHERE id = $4 AND user_id = $5 AND is_deleted = false
-     RETURNING id, user_id, content, media_url, comments_enabled, created_at, updated_at`,
-    [content, media_url, comments_enabled, postId, userId],
-  )
+     WHERE id = $5 AND user_id = $6 AND is_deleted = false
+     RETURNING id, user_id, content, media_url, comments_enabled, created_at, updated_at, scheduled_at`,
+    [content, media_url, comments_enabled, scheduled_at, postId, userId],
+  );
+  return result.rows[0] || null;
+};
 
-  return result.rows[0] || null
-}
-
-// TODO: Implement searchPosts function for content search
 /**
  * Search posts by content
  * @param {string} searchTerm - Search term
@@ -156,14 +152,15 @@ const searchPosts = async (searchTerm, limit = 20, offset = 0) => {
             (SELECT COUNT(*) FROM comments WHERE post_id = p.id AND is_deleted = false) as comments_count
      FROM posts p
      JOIN users u ON p.user_id = u.id
-     WHERE p.content ILIKE $1 AND p.is_deleted = false AND u.is_deleted = false
-     ORDER BY p.created_at DESC
+     WHERE p.content ILIKE $1 AND p.is_deleted = false 
+       AND p.scheduled_at <= NOW()
+       AND u.is_deleted = false
+     ORDER BY p.scheduled_at DESC
      LIMIT $2 OFFSET $3`,
     [`%${searchTerm}%`, limit, offset],
-  )
-
-  return result.rows
-}
+  );
+  return result.rows;
+};
 
 module.exports = {
   createPost,

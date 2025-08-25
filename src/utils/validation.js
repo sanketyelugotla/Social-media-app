@@ -20,6 +20,7 @@ const createPostSchema = Joi.object({
 	content: Joi.string().min(1).max(1000).required(),
 	media_url: Joi.string().uri().optional(),
 	comments_enabled: Joi.boolean().default(true),
+	scheduled_at: Joi.date().iso().optional()
 });
 
 const updatePostSchema = Joi.object({
@@ -45,6 +46,7 @@ const validateRequest = (schema) => {
 		}
 
 		req.validatedData = value;
+		console.log(value)
 		next();
 	};
 };
