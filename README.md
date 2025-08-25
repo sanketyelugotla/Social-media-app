@@ -37,30 +37,32 @@ A complete social media platform backend built with Node.js, Express, and Postgr
 
 1. Clone the repository
 2. Install dependencies:
-   \`\`\`bash
+   ```bash
    npm install
-   \`\`\`
+   ```
 
 3. Set up environment variables:
-   \`\`\`bash
+   ```bash
    cp .env.example .env
 
    ## Edit .env with your database credentials and JWT secret
 
-   \`\`\`
+   ```
 
 4. Set up the database:
-   \`\`\`bash
+
+   ```bash
 
    ## Create database and run schema
 
    npm run setup-db
-   \`\`\`
+   ```
 
 5. Start the development server:
-   \`\`\`bash
+
+   ```bash
    npm run dev
-   \`\`\`
+   ```
 
 6. Start in production mode:
 
@@ -123,18 +125,6 @@ The API will be available at `http://localhost:3000`
 - `GET /api/comments/post/:post_id` - Get post comments
 - `GET /api/comments/user/:user_id` - Get user's comments
 - `GET /api/comments/my-comments` - Get your comments
-
-## Testing
-
-Run the test suite:
-\`\`\`bash
-npm test
-\`\`\`
-
-Run tests with coverage:
-\`\`\`bash
-npm run test:coverage
-\`\`\`
 
 ## Deployment
 
