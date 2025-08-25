@@ -12,7 +12,7 @@ const {
     remove,
     getPostCommentsController,
     getUserCommentsController,
-    getMyComments.
+    getMyComments,
     
 } = require("../controllers/comments")
 
