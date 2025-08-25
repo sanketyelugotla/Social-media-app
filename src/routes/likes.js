@@ -1,7 +1,7 @@
 const express = require("express")
 const { authenticateToken } = require("../middleware/auth")
 const { validateLikePost, validatePostId } = require("../middleware/validation")
-const { like, unlike, getPostLikesController, getUserLikesController } = require("../controllers/likes")
+const { like, unlike, getPostLikesController, getUserLikesController, getMyLikes } = require("../controllers/likes")
 
 const router = express.Router();
 
@@ -21,5 +21,8 @@ router.get("/post/:post_id", authenticateToken, validatePostId, getPostLikesCont
 
 // TODO: GET /api/likes/user/:user_id - Get posts liked by a user
 router.get("/user/:user_id", authenticateToken, getUserLikesController)
+
+// Get current user's liked posts
+router.get("/my-likes", authenticateToken, getMyLikes)
 
 module.exports = router;

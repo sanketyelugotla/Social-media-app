@@ -141,10 +141,37 @@ const getUserLikesController = async (req, res) => {
 	}
 }
 
+/**
+ * Get current user's liked posts
+ */
+const getMyLikes = async (req, res) => {
+	try {
+		const userId = req.user.id
+		const page = Number.parseInt(req.query.page) || 1
+		const limit = Number.parseInt(req.query.limit) || 20
+		const offset = (page - 1) * limit
+
+		const likedPosts = await getUserLikes(userId, limit, offset)
+
+		res.json({
+			liked_posts: likedPosts,
+			pagination: {
+				page,
+				limit,
+				hasMore: likedPosts.length === limit,
+			},
+		})
+	} catch (error) {
+		logger.critical("Get my likes error:", error)
+		res.status(500).json({ error: "Internal server error" })
+	}
+}
+
 module.exports = {
 	// Functions will be implemented here
 	like,
 	unlike,
 	getPostLikesController,
 	getUserLikesController,
+	getMyLikes,
 };

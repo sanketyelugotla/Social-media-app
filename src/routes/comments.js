@@ -11,6 +11,9 @@ const {
     update,
     remove,
     getPostCommentsController,
+    getUserCommentsController,
+    getMyComments.
+    
 } = require("../controllers/comments")
 
 const router = express.Router();
@@ -31,5 +34,11 @@ router.delete("/:comment_id", authenticateToken, validateCommentId, remove)
 
 // TODO: GET /api/comments/post/:post_id - Get comments for a post
 router.get("/post/:post_id", authenticateToken, validatePostId, getPostCommentsController)
+
+// Get comments by a user
+router.get("/user/:user_id", authenticateToken, getUserCommentsController)
+
+// Get current user's comments
+router.get("/my-comments", authenticateToken, getMyComments)
 
 module.exports = router;

@@ -161,7 +161,57 @@ const getPostCommentsController = async (req, res) => {
 		res.status(500).json({ error: "Internal server error" })
 	}
 }
+/**
+ * Get comments by a user
+ */
+const getUserCommentsController = async (req, res) => {
+	try {
+		const { user_id } = req.params
+		const page = Number.parseInt(req.query.page) || 1
+		const limit = Number.parseInt(req.query.limit) || 20
+		const offset = (page - 1) * limit
 
+		const comments = await getUserComments(Number.parseInt(user_id), limit, offset)
+
+		res.json({
+			comments,
+			pagination: {
+				page,
+				limit,
+				hasMore: comments.length === limit,
+			},
+		})
+	} catch (error) {
+		logger.critical("Get user comments error:", error)
+		res.status(500).json({ error: "Internal server error" })
+	}
+}
+
+/**
+ * Get current user's comments
+ */
+const getMyComments = async (req, res) => {
+	try {
+		const userId = req.user.id
+		const page = Number.parseInt(req.query.page) || 1
+		const limit = Number.parseInt(req.query.limit) || 20
+		const offset = (page - 1) * limit
+
+		const comments = await getUserComments(userId, limit, offset)
+
+		res.json({
+			comments,
+			pagination: {
+				page,
+				limit,
+				hasMore: comments.length === limit,
+			},
+		})
+	} catch (error) {
+		logger.critical("Get my comments error:", error)
+		res.status(500).json({ error: "Internal server error" })
+	}
+}
 
 module.exports = {
 	// Functions will be implemented here
@@ -169,4 +219,6 @@ module.exports = {
 	update,
 	remove,
 	getPostCommentsController,
+	getUserCommentsController,
+	getMyComments,
 };
